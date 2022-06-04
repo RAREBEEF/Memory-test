@@ -2,8 +2,6 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import styles from "./App.module.scss";
 import "./App.module.scss";
 
-// TODO:클리어문구 보여주기, 클리어문구 보여줄 동안 카운트다운x & 카운트 시작과 동시에 카드 보여주기
-
 function App() {
   // 최초 시작
   const [start, setStart] = useState<boolean>(false);
@@ -14,11 +12,10 @@ function App() {
     () => Array.from(new Array(cardEls.length), (x, i) => i + 1),
     [cardEls]
   );
-  // 카드의 개수
-  const cardCount = useMemo(() => cards.length, [cards]);
+
   // 현재 라운드
   const [round, setRound] = useState<number>(1);
-  // 난이도
+  // 난이도(보드 크기)
   const [difficulty, setDifficulty] = useState<number>(3);
   // 라운드 시작 여부(클릭 가능 여부 결정)
   const [roundRunning, setRoundRunning] = useState<boolean>(false);
@@ -43,49 +40,14 @@ function App() {
     });
 
     setRound(1);
+    setDifficulty(3);
     setIsFail(false);
     setStart(false);
     setCountdown(4);
   };
 
-  // 카드 클릭 함수
-  const onCardClick = (e: any) => {
-    // 라운드 시작 전 or 중복 클릭
-    if (!roundRunning || clickedCards.indexOf(e.target.id) !== -1) {
-      return;
-    }
-
-    // 오답일 경우 & 오답 아닐 경우
-    if (answer.indexOf(e.target.id) === -1) {
-      e.target.style.backgroundColor = "red";
-
-      gameover();
-      clearTimeout(endCountdownClear);
-
-      return;
-    } else {
-      e.target.style.backgroundColor = "green";
-    }
-
-    // 클릭수와 정답개수가 동일하면 다음 라운드, 아닐 경우 계속 클릭 진행
-    if (clickCount + 1 === answer.length) {
-      nextRound();
-      setIsSuccesss(true);
-    } else {
-      setClickCount((prev) => prev + 1);
-      setClickedCards((prev) => [...prev, e.target.id]);
-    }
-  };
-
-  // 게임오버
-  const gameover = () => {
-    setIsFail(true);
-    setRoundRunning(false);
-    setClickCount(0);
-  };
-
   // 다음 라운드 진행 전 초기화
-  const nextRound = () => {
+  const nextRound = useCallback(() => {
     console.log("success");
     clearTimeout(endCountdownClear);
     setClickCount(0);
@@ -93,12 +55,59 @@ function App() {
     setCountdown(4);
     setRoundRunning(false);
     setRound((prev) => prev + 1);
-  };
+  }, [endCountdownClear]);
 
-  // 1초 대기
-  // 카운트 시작 & 색 표시
-  //
-  //
+  // 게임오버
+  const gameover = useCallback(() => {
+    cardEls.forEach((el: any) => {
+      if (answer.indexOf(el.id) !== -1 && clickedCards.indexOf(el.id) === -1) {
+        el.style.backgroundColor = "white";
+      }
+    });
+    setIsFail(true);
+    setRoundRunning(false);
+    setClickCount(0);
+  }, [answer, cardEls, clickedCards]);
+
+  // 카드 클릭 함수
+  const onCardClick = useCallback(
+    (e: any) => {
+      // 라운드 시작 전 or 중복 클릭
+      if (!roundRunning || clickedCards.indexOf(e.target.id) !== -1) {
+        return;
+      }
+
+      // 오답일 경우 & 오답 아닐 경우
+      if (answer.indexOf(e.target.id) === -1) {
+        e.target.style.backgroundColor = "red";
+
+        gameover();
+        clearTimeout(endCountdownClear);
+
+        return;
+      } else {
+        e.target.style.backgroundColor = "green";
+      }
+
+      // 클릭수와 정답개수가 동일하면 다음 라운드, 아닐 경우 계속 클릭 진행
+      if (clickCount + 1 === answer.length) {
+        nextRound();
+        setIsSuccesss(true);
+      } else {
+        setClickCount((prev) => prev + 1);
+        setClickedCards((prev) => [...prev, e.target.id]);
+      }
+    },
+    [
+      answer,
+      clickCount,
+      clickedCards,
+      endCountdownClear,
+      gameover,
+      nextRound,
+      roundRunning,
+    ]
+  );
 
   // 라운드 시간제한
   const endCountdown = useCallback((time = 9000) => {
@@ -108,12 +117,32 @@ function App() {
     }, time);
 
     setEndCountdownClear(endTimer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const changeDifficulty = useCallback(
+    (num: number) => {
+      cardEls.forEach((el: any) => {
+        el.style.backgroundColor = "skyblue";
+      });
+
+      setDifficulty(num);
+    },
+    [cardEls]
+  );
 
   // 라운드 시작
   const roundStart = useCallback(() => {
     if (!start) {
       return;
+    }
+
+    if (round === 5) {
+      changeDifficulty(4);
+    } else if (round === 9) {
+      changeDifficulty(5);
+    } else if (round === 13) {
+      changeDifficulty(6);
     }
 
     const delayTimer = setTimeout(() => {
@@ -125,7 +154,11 @@ function App() {
 
       const newAnswer = [...cards].map((card) => card.toString());
 
-      for (let i = cardCount - round, j = cardCount - 1; i !== 0; i--, j--) {
+      for (
+        let i = difficulty ** 2 - round, j = difficulty ** 2 - 1;
+        i !== 0;
+        i--, j--
+      ) {
         const pick = Math.round(Math.random() * j);
         newAnswer.splice(pick, 1);
       }
@@ -160,17 +193,20 @@ function App() {
     endCountdown();
 
     return { colorTimer, startTimer, countdown, delayTimer };
-  }, [cardCount, cardEls, cards, endCountdown, round, start]);
-
-  //
-  //
-  //
-  //
+  }, [
+    cardEls,
+    cards,
+    changeDifficulty,
+    difficulty,
+    endCountdown,
+    round,
+    start,
+  ]);
 
   // 카드 엘리먼트 불러오기
   useEffect(() => {
     setCardEls(document.querySelectorAll(`.${styles.card}`));
-  }, []);
+  }, [difficulty]);
 
   // 게임오버 카운트다운 클리어
   useEffect(() => {
@@ -178,9 +214,6 @@ function App() {
       clearTimeout(endCountdownClear);
     };
   });
-
-  //
-  //
 
   useEffect(() => {
     if (!start) {
@@ -196,6 +229,38 @@ function App() {
       clearTimeout(delayTimer);
     };
   }, [roundStart, start]);
+
+  const rows = useCallback(() => {
+    const rowsResult: Array<any> = [];
+
+    const cardDeck = (i: number) => {
+      const cardDeckResult: Array<any> = [];
+
+      for (let j = 1; j <= difficulty; j++) {
+        const id = -difficulty + j + difficulty * i;
+        cardDeckResult.push(
+          <div
+            id={`${id}`}
+            key={`${id}`}
+            className={styles.card}
+            onClick={onCardClick}
+          ></div>
+        );
+      }
+
+      return cardDeckResult;
+    };
+
+    for (let i = 1; i <= difficulty; i++) {
+      rowsResult.push(
+        <div key={i} className={styles.row}>
+          {cardDeck(i)}
+        </div>
+      );
+    }
+
+    return rowsResult;
+  }, [difficulty, onCardClick]);
 
   return (
     <div className={styles.container}>
@@ -222,32 +287,7 @@ function App() {
           ? "Success"
           : start && (countdown === 0 ? "Start" : countdown !== 4 && countdown)}
       </h2>
-      <div className={styles.board}>
-        <div className={styles.row}>
-          <div id="1" className={styles.card} onClick={onCardClick}></div>
-          <div id="2" className={styles.card} onClick={onCardClick}></div>
-          <div id="3" className={styles.card} onClick={onCardClick}></div>
-          <div id="4" className={styles.card} onClick={onCardClick}></div>
-        </div>
-        <div className={styles.row}>
-          <div id="5" className={styles.card} onClick={onCardClick}></div>
-          <div id="6" className={styles.card} onClick={onCardClick}></div>
-          <div id="7" className={styles.card} onClick={onCardClick}></div>
-          <div id="8" className={styles.card} onClick={onCardClick}></div>
-        </div>
-        <div className={styles.row}>
-          <div id="9" className={styles.card} onClick={onCardClick}></div>
-          <div id="10" className={styles.card} onClick={onCardClick}></div>
-          <div id="11" className={styles.card} onClick={onCardClick}></div>
-          <div id="12" className={styles.card} onClick={onCardClick}></div>
-        </div>
-        <div className={styles.row}>
-          <div id="13" className={styles.card} onClick={onCardClick}></div>
-          <div id="14" className={styles.card} onClick={onCardClick}></div>
-          <div id="15" className={styles.card} onClick={onCardClick}></div>
-          <div id="16" className={styles.card} onClick={onCardClick}></div>
-        </div>
-      </div>
+      <div className={styles.board}>{rows()}</div>
     </div>
   );
 }
