@@ -1,0 +1,42 @@
+.container {
+  background-color: skyblue;
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+
+  .round {
+    margin: {
+      bottom: 60px;
+    }
+  }
+
+  .board {
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    width: 70vw;
+    height: 70vw;
+    max-width: 90vh;
+    max-height: 90vh;
+    background-color: whitesmoke;
+    border-radius: 15px;
+    padding: 1%;
+
+    .row {
+      flex-grow: 1;
+      display: flex;
+
+      .card {
+        transition: background-color 0.3s;
+        cursor: pointer;
+        border-radius: 15px;
+        flex-grow: 1;
+        background-color: skyblue;
+        margin: 1%;
+      }
+    }
+  }
+}
