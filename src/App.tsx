@@ -33,12 +33,19 @@ function App() {
   const [countdown, setCountdown] = useState<number>(4);
   // 게임오버 카운트다운 클리너
   const [endCountdownClear, setEndCountdownClear] = useState<any>(() => {});
+  // 난이도업 딜레이 타이머 클리너
+  const [difficultyUpDelayClear, setDifficultyUpDelayClear] = useState<any>(
+    () => {}
+  );
 
   const restart = () => {
     cardEls.forEach((el: any) => {
-      el.style.backgroundColor = "skyblue";
+      el.style.backgroundColor = "whitesmoke";
+      el.style.boxShadow = "none";
+      el.style.borderColor = "black";
     });
-
+    setClickedCards([]);
+    setClickCount(0);
     setRound(1);
     setDifficulty(3);
     setIsFail(false);
@@ -61,7 +68,16 @@ function App() {
   const gameover = useCallback(() => {
     cardEls.forEach((el: any) => {
       if (answer.indexOf(el.id) !== -1 && clickedCards.indexOf(el.id) === -1) {
-        el.style.backgroundColor = "white";
+        el.style.backgroundColor = "whitesmoke";
+        el.style.boxShadow = "0px 0px 15px orange, 0px 0px 30px whitesmoke";
+        el.style.borderColor = "orange";
+      } else if (answer.indexOf(el.id) !== -1) {
+        el.style.backgroundColor = "whitesmoke";
+        el.style.boxShadow = "0px 0px 15px #48cae4, 0px 0px 30px whitesmoke";
+        el.style.borderColor = "#48cae4";
+      } else {
+        el.style.backgroundColor = "black";
+        el.style.borderColor = "black";
       }
     });
     setIsFail(true);
@@ -79,20 +95,38 @@ function App() {
 
       // 오답일 경우 & 오답 아닐 경우
       if (answer.indexOf(e.target.id) === -1) {
-        e.target.style.backgroundColor = "red";
+        e.target.style.backgroundColor = "#bf1f1f";
+        e.target.style.boxShadow =
+          "0px 0px 15px #bf1f1f, 0px 0px 30px whitesmoke";
+        e.target.style.borderColor = "#bf1f1f";
 
         gameover();
         clearTimeout(endCountdownClear);
 
         return;
       } else {
-        e.target.style.backgroundColor = "green";
+        e.target.style.backgroundColor = "whitesmoke";
+        e.target.style.boxShadow =
+          "0px 0px 15px #48cae4, 0px 0px 30px whitesmoke";
+        e.target.style.borderColor = "#48cae4";
       }
 
       // 클릭수와 정답개수가 동일하면 다음 라운드, 아닐 경우 계속 클릭 진행
       if (clickCount + 1 === answer.length) {
-        nextRound();
         setIsSuccesss(true);
+
+        // 난이도 업일 경우 1초 딜레이
+        if (round === 4 || round === 8 || round === 12) {
+          const difficultyUpDelay = setTimeout(() => {
+            nextRound();
+          }, 1000);
+
+          setDifficultyUpDelayClear(difficultyUpDelay);
+
+          return;
+        }
+
+        nextRound();
       } else {
         setClickCount((prev) => prev + 1);
         setClickedCards((prev) => [...prev, e.target.id]);
@@ -105,12 +139,13 @@ function App() {
       endCountdownClear,
       gameover,
       nextRound,
+      round,
       roundRunning,
     ]
   );
 
   // 라운드 시간제한
-  const endCountdown = useCallback((time = 9000) => {
+  const endCountdown = useCallback((time: number) => {
     const endTimer = setTimeout(() => {
       console.log("end");
       gameover();
@@ -123,7 +158,9 @@ function App() {
   const changeDifficulty = useCallback(
     (num: number) => {
       cardEls.forEach((el: any) => {
-        el.style.backgroundColor = "skyblue";
+        el.style.backgroundColor = "whitesmoke";
+        el.style.boxShadow = "none";
+        el.style.borderColor = "black";
       });
 
       setDifficulty(num);
@@ -137,19 +174,29 @@ function App() {
       return;
     }
 
+    let delay = 0;
+
     if (round === 5) {
+      delay = 1000;
+      setCountdown(5);
       changeDifficulty(4);
     } else if (round === 9) {
+      delay = 1000;
+      setCountdown(5);
       changeDifficulty(5);
     } else if (round === 13) {
+      delay = 1000;
+      setCountdown(5);
       changeDifficulty(6);
     }
 
-    const delayTimer = setTimeout(() => {
+    const prepareTimer = setTimeout(() => {
       setIsSuccesss(false);
 
       cardEls.forEach((el: any) => {
-        el.style.backgroundColor = "skyblue";
+        el.style.backgroundColor = "whitesmoke";
+        el.style.boxShadow = "none";
+        el.style.borderColor = "black";
       });
 
       const newAnswer = [...cards].map((card) => card.toString());
@@ -169,10 +216,15 @@ function App() {
 
       cardEls.forEach((el: any) => {
         if (newAnswer.indexOf(el.id) !== -1) {
-          el.style.backgroundColor = "white";
+          el.style.backgroundColor = "whitesmoke";
+          el.style.boxShadow = "0px 0px 15px #48cae4, 0px 0px 30px whitesmoke";
+          el.style.borderColor = "#48cae4";
+        } else {
+          el.style.backgroundColor = "black";
+          el.style.borderColor = "black";
         }
       });
-    }, 1000);
+    }, 1000 + delay);
 
     const countdown = setInterval(() => {
       setCountdown((prev) => prev - 1);
@@ -180,19 +232,23 @@ function App() {
 
     const colorTimer = setTimeout(() => {
       cardEls.forEach((el: any) => {
-        el.style.backgroundColor = "skyblue";
+        el.style.backgroundColor = "whitesmoke";
+        el.style.boxShadow = "none";
+        el.style.borderColor = "black";
       });
-    }, 2500);
+    }, 3000 + delay);
 
     const startTimer = setTimeout(() => {
       setRoundRunning(true);
       setCountdown(0);
       clearTimeout(countdown);
-    }, 4000);
+    }, 4000 + delay);
 
-    endCountdown();
+    endCountdown(9000 + delay);
 
-    return { colorTimer, startTimer, countdown, delayTimer };
+    delay = 0;
+
+    return { colorTimer, startTimer, countdown, delayTimer: prepareTimer };
   }, [
     cardEls,
     cards,
@@ -212,6 +268,7 @@ function App() {
   useEffect(() => {
     return () => {
       clearTimeout(endCountdownClear);
+      clearTimeout(difficultyUpDelayClear);
     };
   });
 
@@ -282,10 +339,11 @@ function App() {
       )}
       <h2 className={styles.status}>
         {isFail
-          ? "Fail"
+          ? ""
           : isSuccess
           ? "Success"
-          : start && (countdown === 0 ? "Start" : countdown !== 4 && countdown)}
+          : start &&
+            (countdown === 0 ? "Click!" : countdown !== 4 && countdown)}
       </h2>
       <div className={styles.board}>{rows()}</div>
     </div>
