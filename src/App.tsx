@@ -118,9 +118,9 @@ function App() {
       setClickedCards((prev) => [...prev, e.target.id]);
 
       // 디버그용
-      if (e.target.id === "1") {
-        clear();
-        return;
+      // if (e.target.id === "1") {
+      //   clear();
+      //   return;
         // setIsSuccesss(true);
 
         // // 난이도 업일 경우 1초 딜레이
@@ -136,7 +136,7 @@ function App() {
 
         // nextRound();
         // return;
-      }
+      // }
 
       // 오답일 경우 & 오답 아닐 경우
       if (answer.indexOf(e.target.id) === -1) {
