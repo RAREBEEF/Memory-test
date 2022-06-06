@@ -12,72 +12,94 @@
   flex-direction: column;
   position: relative;
 
-  .start {
-    color: whitesmoke;
-    text-shadow: 0px 0px 5px black;
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    .start__text {
-      cursor: pointer;
-      font-size: 200px;
-      font-weight: 700;
-      margin: {
-        // top: 110px;
-      }
-    }
-  }
-
-  .status {
-    position: absolute;
-    pointer-events: none;
-    left: 0;
-    right: 0;
-    top: 0;
-    bottom: 0;
-    color: whitesmoke;
-    height: 50px;
-    margin: auto;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    // text-shadow: 0px 0px 25px black;
-    font-size: 200px;
-    // margin: {
-    //   bottom: 30px;
-    //   top: 30px;
-    // }
-    // background-color: white;
-    text-shadow: 0px 0px 5px black;
-  }
-
-  .board {
-    overflow: hidden;
+  .header {
     display: flex;
     flex-direction: column;
     width: 70vw;
-    height: 70vw;
     max-width: 80vh;
-    max-height: 80vh;
-    background-color: black;
-    border-radius: 15px;
-    padding: 1%;
 
-    .row {
-      flex-grow: 1;
+    .round {
+      text-align: center;
+      height: 50px;
+      font-size: 30px;
+    }
+
+    .level {
+      height: 30px;
+      padding-left: 10px;
+    }
+  }
+
+  .content {
+    position: relative;
+
+    .start {
+      // background-color: red;
+      z-index: 10;
+      color: whitesmoke;
+      text-shadow: 0px 0px 10px black;
+      width: 100%;
+      height: 100%;
+      position: absolute;
       display: flex;
-
-      .card {
-        border: 1px solid black;
-        transition: background-color 0.3s;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      .start__text {
         cursor: pointer;
-        border-radius: 15px;
+        font-size: 20vw;
+        font-weight: 700;
+        text-align: center;
+      }
+      .clear {
+        font-weight: 700;
+        font-size: 12vw;
+      }
+    }
+
+    .status {
+      position: absolute;
+      pointer-events: none;
+      left: 0;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      color: whitesmoke;
+      height: 50px;
+      margin: auto;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 10vw;
+      text-shadow: 0px 0px 10px black;
+      text-align: center;
+    }
+
+    .board {
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      width: 70vw;
+      height: 70vw;
+      max-width: 80vh;
+      max-height: 80vh;
+      background-color: black;
+      border-radius: 15px;
+      padding: 1%;
+
+      .row {
         flex-grow: 1;
-        background-color: whitesmoke;
-        margin: 1%;
+        display: flex;
+
+        .card {
+          border: 1px solid whitesmoke;
+          transition: background-color 0.3s;
+          cursor: pointer;
+          border-radius: 15px;
+          flex-grow: 1;
+          background-color: whitesmoke;
+          margin: 1%;
+        }
       }
     }
   }
