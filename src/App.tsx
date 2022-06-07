@@ -44,7 +44,7 @@ function App() {
   const [difficultyUpDelayClear, setDifficultyUpDelayClear] = useState<any>(
     () => {}
   );
-
+  // gsap
   const [animations, setAnimations] = useState<Array<any>>([]);
 
   const clear = useCallback(() => {
@@ -117,25 +117,13 @@ function App() {
 
       setClickedCards((prev) => [...prev, e.target.id]);
 
-      // 디버그용
+      // 디버그용;
       // if (e.target.id === "1") {
-      //   clear();
+      // clear();
+      // setIsSuccesss(true);
+
+      // nextRound();
       //   return;
-        // setIsSuccesss(true);
-
-        // // 난이도 업일 경우 1초 딜레이
-        // if (round === 4 || round === 12 || round === 16) {
-        //   const difficultyUpDelay = setTimeout(() => {
-        //     nextRound();
-        //   }, 1000);
-
-        //   setDifficultyUpDelayClear(difficultyUpDelay);
-
-        //   return;
-        // }
-
-        // nextRound();
-        // return;
       // }
 
       // 오답일 경우 & 오답 아닐 경우
@@ -340,7 +328,7 @@ function App() {
         );
       });
 
-      setAnimations(animationArr);
+      setAnimations((prev) => [...prev, ...animationArr]);
     }
   }, [cardEls, start]);
 
@@ -404,13 +392,12 @@ function App() {
       <div className={styles.header}>
         <h2 className={styles.round}>Round {displayRound}</h2>
         <h3 className={styles.level}>
-          Level :{" "}
           {displayRound >= 25
             ? "Expert"
             : displayRound >= 13
             ? "Hard"
             : displayRound >= 5
-            ? "Medium"
+            ? "Normal"
             : "Easy"}
         </h3>
       </div>
@@ -418,12 +405,18 @@ function App() {
       <div className={styles.content}>
         {(!start || isFail || gameClear) && (
           <div className={styles.start}>
-            {gameClear && (
-              <span className={styles["clear"]}>Congraturation!</span>
+            {(isFail || gameClear) && (
+              <div className={styles["result"]}>
+                {gameClear && (
+                  <div className={styles["clear"]}>Congratulation!</div>
+                )}
+                <div className={styles["score__text"]}>Score</div>
+                <div className={styles["score__round"]}>{round}</div>
+              </div>
             )}
             <span
               className={styles["start__text"]}
-              style={{ fontSize: gameClear ? "5vw" : "20vw" }}
+              style={{ fontSize: gameClear || isFail ? "5vmin" : "20vmin" }}
               onClick={() => {
                 animations.forEach((el) => {
                   el.kill();

@@ -4,8 +4,8 @@
 
 .container {
   background-color: whitesmoke;
-  height: 100vh;
-  width: 100vw;
+  min-height: 100vh;
+  min-width: 100vw;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -14,19 +14,18 @@
 
   .header {
     display: flex;
-    flex-direction: column;
     width: 70vw;
     max-width: 80vh;
-
+    justify-content: space-between;
+    align-items: flex-end;
+    padding: 10px 10px;
     .round {
       text-align: center;
-      height: 50px;
-      font-size: 30px;
+      font-size: 20px;
     }
 
     .level {
-      height: 30px;
-      padding-left: 10px;
+      font-size: 20px;
     }
   }
 
@@ -34,7 +33,6 @@
     position: relative;
 
     .start {
-      // background-color: red;
       z-index: 10;
       color: whitesmoke;
       text-shadow: 0px 0px 10px black;
@@ -45,15 +43,43 @@
       flex-direction: column;
       justify-content: center;
       align-items: center;
+
       .start__text {
+        transition: transform 0.3s;
         cursor: pointer;
         font-size: 20vw;
         font-weight: 700;
         text-align: center;
+        white-space: nowrap;
+        &:hover {
+          transform: scale(1.1);
+        }
       }
-      .clear {
-        font-weight: 700;
-        font-size: 12vw;
+
+      .result {
+        .clear {
+          font-weight: 700;
+          font-size: 12vmin;
+          white-space: nowrap;
+          margin: {
+            bottom: 5vmin;
+          }
+        }
+
+        .score__text {
+          font-weight: 700;
+          font-size: 8vmin;
+          white-space: nowrap;
+          text-align: center;
+        }
+        .score__round {
+          font-weight: 700;
+          font-size: 10vmin;
+          text-align: center;
+          margin: {
+            bottom: 5vmin;
+          }
+        }
       }
     }
 
@@ -70,7 +96,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      font-size: 10vw;
+      font-size: 10vmin;
       text-shadow: 0px 0px 10px black;
       text-align: center;
     }
@@ -79,10 +105,9 @@
       overflow: hidden;
       display: flex;
       flex-direction: column;
-      width: 70vw;
-      height: 70vw;
-      max-width: 80vh;
-      max-height: 80vh;
+      width: 80vmin;
+      height: 80vmin;
+
       background-color: black;
       border-radius: 15px;
       padding: 1%;
@@ -92,8 +117,8 @@
         display: flex;
 
         .card {
-          border: 1px solid whitesmoke;
-          transition: background-color 0.3s;
+          border: 3px solid whitesmoke;
+          transition: 0.3s;
           cursor: pointer;
           border-radius: 15px;
           flex-grow: 1;
