@@ -13,7 +13,6 @@ function App() {
     () => Array.from(new Array(cardEls.length), (x, i) => i + 1),
     [cardEls]
   );
-
   // 현재 라운드
   const [round, setRound] = useState<number>(1);
   // 화면에 출력할 라운드
@@ -47,12 +46,14 @@ function App() {
   // gsap
   const [animations, setAnimations] = useState<Array<any>>([]);
 
+  // 게임 클리어
   const clear = useCallback(() => {
     setGameClear(true);
     setStart(false);
     setRoundRunning(false);
   }, []);
 
+  // 재시작
   const restart = () => {
     cardEls.forEach((el: any) => {
       el.style.backgroundColor = "whitesmoke";
@@ -148,7 +149,7 @@ function App() {
       if (clickCount + 1 === answer.length) {
         setIsSuccesss(true);
 
-        // 난이도 업일 경우 1초 딜레이
+        // 난이도 업일 경우 1초 딜레이 후 라운드 진행
         if (round === 4 || round === 12 || round === 24) {
           const difficultyUpDelay = setTimeout(() => {
             nextRound();
@@ -194,6 +195,7 @@ function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // 난이도 업
   const changeDifficulty = useCallback(
     (num: number) => {
       cardEls.forEach((el: any) => {
@@ -201,6 +203,7 @@ function App() {
         el.style.boxShadow = "none";
         el.style.borderColor = "whitesmoke";
       });
+
       setAnswerCount(1);
       setDifficulty(num);
     },
@@ -213,8 +216,10 @@ function App() {
       return;
     }
 
+    // 난이도 업일 경우 타이머에 시간 추가용 변수
     let delay = 0;
 
+    // 난이도 업
     if (round === 5) {
       delay = 1000;
       setCountdown(5);
@@ -232,21 +237,25 @@ function App() {
       setDisplayRound(25);
     }
 
+    // 라운드 준비
     const prepareTimer = setTimeout(() => {
       setIsSuccesss(false);
 
+      // 난이도 업이 아니면 여기서 displayRound 증가.
+      // 난이도 업이면 위에서 직접 증가시키기 때문에 skip
       if (round !== 5 && round !== 13 && round !== 21) {
         setDisplayRound((prev) => prev + 1);
       }
 
+      // 색상 초기화
       cardEls.forEach((el: any) => {
         el.style.backgroundColor = "whitesmoke";
         el.style.boxShadow = "none";
         el.style.borderColor = "whitesmoke";
       });
 
+      // 정답 생성
       const newAnswer = [...cards].map((card) => card.toString());
-
       for (
         let i = difficulty ** 2 - answerCount, j = difficulty ** 2 - 1;
         i !== 0;
@@ -258,8 +267,7 @@ function App() {
 
       setAnswer(newAnswer);
 
-      console.log(newAnswer);
-
+      // 정답 표시
       cardEls.forEach((el: any) => {
         if (newAnswer.indexOf(el.id) !== -1) {
           el.style.backgroundColor = "whitesmoke";
@@ -272,10 +280,12 @@ function App() {
       });
     }, 1000 + delay);
 
+    // 시작 카운트다운(출력용)
     const countdown = setInterval(() => {
       setCountdown((prev) => prev - 1);
     }, 1000);
 
+    //  정답 표시 색상 초기화
     const colorTimer = setTimeout(() => {
       cardEls.forEach((el: any) => {
         el.style.backgroundColor = "whitesmoke";
@@ -284,6 +294,7 @@ function App() {
       });
     }, 3000 + delay);
 
+    // 시작 카운트다운(계산용)
     const startTimer = setTimeout(() => {
       setRoundRunning(true);
       setCountdown(0);
@@ -311,6 +322,7 @@ function App() {
     setCardEls(document.querySelectorAll(`.${styles.card}`));
   }, [difficulty]);
 
+  // 카드 반짝반짝 효과
   useEffect(() => {
     if (!start && cardEls.length !== 0) {
       const animationArr: Array<any> = [];
@@ -340,6 +352,7 @@ function App() {
     };
   });
 
+  // 라운드 시작마다 실행
   useEffect(() => {
     if (!start) {
       return;
@@ -355,15 +368,18 @@ function App() {
     };
   }, [roundStart, start]);
 
-  const rows = useCallback(() => {
-    const rowsResult: Array<any> = [];
+  // 카드 생성 함수
+  // n개의 카드를 n줄 생성한다.
+  const rowsGenerator = useCallback(() => {
+    const rowsReturn: Array<any> = [];
 
-    const cardDeck = (i: number) => {
-      const cardDeckResult: Array<any> = [];
+    // 카드 생성기
+    const cardsGenerator = (i: number) => {
+      const cardsReturn: Array<any> = [];
 
       for (let j = 1; j <= difficulty; j++) {
         const id = -difficulty + j + difficulty * i;
-        cardDeckResult.push(
+        cardsReturn.push(
           <div
             id={`${id}`}
             key={`${id}`}
@@ -373,18 +389,20 @@ function App() {
         );
       }
 
-      return cardDeckResult;
+      return cardsReturn;
     };
 
+    // 줄 생성기
     for (let i = 1; i <= difficulty; i++) {
-      rowsResult.push(
+      rowsReturn.push(
         <div key={i} className={styles.row}>
-          {cardDeck(i)}
+          {/* 카드 생성 */}
+          {cardsGenerator(i)}
         </div>
       );
     }
 
-    return rowsResult;
+    return rowsReturn;
   }, [difficulty, onCardClick]);
 
   return (
@@ -447,7 +465,7 @@ function App() {
             : start &&
               (countdown === 0 ? "Click!" : countdown !== 4 && countdown)}
         </h2>
-        <div className={styles.board}>{rows()}</div>
+        <div className={styles.board}>{rowsGenerator()}</div>
       </div>
     </div>
   );
