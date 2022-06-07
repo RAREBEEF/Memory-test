@@ -15,6 +15,8 @@ function App() {
   );
   // 현재 라운드
   const [round, setRound] = useState<number>(1);
+  // 목숨
+  const [life, setLife] = useState<number>(1);
   // 화면에 출력할 라운드
   const [displayRound, setDisplayRound] = useState<number>(0);
   // 난이도(보드 크기)
@@ -65,6 +67,7 @@ function App() {
     setClickedCards([]);
     setClickCount(0);
     setRound(1);
+    setLife(1);
     setAnswerCount(1);
     setDifficulty(3);
     setIsFail(false);
@@ -79,6 +82,7 @@ function App() {
     setClickedCards([]);
     setCountdown(4);
     setRoundRunning(false);
+    setLife(1);
     setRound((prev) => prev + 1);
     setAnswerCount((prev) => prev + 1);
   }, [endCountdownClear]);
@@ -98,7 +102,7 @@ function App() {
         answer.indexOf(el.id) === -1 &&
         clickedCards.indexOf(el.id) !== -1
       ) {
-        el.style.backgroundColor = "black";
+        el.style.backgroundColor = "whitesmoke";
         el.style.boxShadow = "0px 0px 15px #bf1f1f, 0px 0px 30px whitesmoke";
         el.style.borderColor = "#bf1f1f";
       }
@@ -134,8 +138,12 @@ function App() {
           "0px 0px 15px #bf1f1f, 0px 0px 30px whitesmoke";
         e.target.style.borderColor = "#bf1f1f";
 
-        gameover();
-        clearTimeout(endCountdownClear);
+        if (life !== 0) {
+          setLife(0);
+        } else {
+          gameover();
+          clearTimeout(endCountdownClear);
+        }
 
         return;
       } else {
@@ -172,17 +180,7 @@ function App() {
         setClickCount((prev) => prev + 1);
       }
     },
-    [
-      answer,
-      clear,
-      clickCount,
-      clickedCards,
-      endCountdownClear,
-      gameover,
-      nextRound,
-      round,
-      roundRunning,
-    ]
+    [answer, clear, clickCount, clickedCards, endCountdownClear, gameover, life, nextRound, round, roundRunning]
   );
 
   // 라운드 시간제한
