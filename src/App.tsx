@@ -450,12 +450,7 @@ function App() {
             </span>
           </div>
         )}
-        <div
-          className={styles.status}
-          style={{
-            opacity: 0.8,
-          }}
-        >
+        <div className={styles.status}>
           {isFail
             ? ""
             : isSuccess

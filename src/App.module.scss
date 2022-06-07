@@ -4,8 +4,11 @@
 
 .container {
   background-color: whitesmoke;
-  min-height: 100vh;
-  min-width: 100vw;
+  height: 100vh;
+  width: 100vw;
+  @supports (-webkit-touch-callout: none) {
+    height: -webkit-fill-available;
+  }
   display: flex;
   justify-content: center;
   align-items: center;
@@ -33,6 +36,8 @@
     position: relative;
 
     .start {
+      // Fix ios text-shadow bug
+      transform: translateZ(0);
       z-index: 10;
       color: whitesmoke;
       text-shadow: 0px 0px 10px black;
@@ -84,6 +89,7 @@
     }
 
     .status {
+      opacity: 0.8;
       position: absolute;
       pointer-events: none;
       left: 0;
@@ -99,6 +105,8 @@
       font-size: 10vmin;
       text-shadow: 0px 0px 10px black;
       text-align: center;
+      // Fix ios text-shadow bug
+      transform: translateZ(0);
     }
 
     .board {
