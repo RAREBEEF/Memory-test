@@ -408,8 +408,8 @@ function App() {
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <h2 className={styles.round}>Round {displayRound}</h2>
-        <h3 className={styles.level}>
+        <div className={styles.round}>Round {displayRound}</div>
+        <div className={styles.level}>
           {displayRound >= 25
             ? "Expert"
             : displayRound >= 13
@@ -417,7 +417,7 @@ function App() {
             : displayRound >= 5
             ? "Normal"
             : "Easy"}
-        </h3>
+        </div>
       </div>
 
       <div className={styles.content}>
@@ -450,7 +450,7 @@ function App() {
             </span>
           </div>
         )}
-        <h2
+        <div
           className={styles.status}
           style={{
             opacity: 0.8,
@@ -464,7 +464,7 @@ function App() {
               : "Level up"
             : start &&
               (countdown === 0 ? "Click!" : countdown !== 4 && countdown)}
-        </h2>
+        </div>
         <div className={styles.board}>{rowsGenerator()}</div>
       </div>
     </div>
